@@ -53,7 +53,7 @@ def get_decrypted_item (index_key,table_name):
 
 
 def get_item (index_key,table_name):
-    #table_name='CreditCardTokenizerTable'
+    #table_name='TokenTable'
     table = boto3.resource('dynamodb').Table(table_name)
 
     response = table.get_item(Key=index_key)

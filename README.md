@@ -211,14 +211,14 @@ The output will look like
 "Outputs": [
                 {
                     "Description": "ARN for the published Layer version", 
-                    "ExportName": "TokenizeData", 
+                    "ExportName": "TokenProvider", 
                     "OutputKey": "LayerVersionArn", 
                     "OutputValue": "***********"
                 }, 
                 {
                     "Description": "ARN for DynamoDB Table", 
                     "OutputKey": "DynamoDBArn", 
-                    "OutputValue": "***********/CreditCardTokenizerTable"
+                    "OutputValue": "***********/TokenTable"
                 }
 
             ]
@@ -405,7 +405,7 @@ Note the value of `IdToken` from the output for next steps.
 
 
 Now, we will invoke APIs to test the application. There are two APIs - 
-1. **order** - The first API i.e. *order* is to create the customer order, generate the token for credit card number (using Lambda Layer) and store encrypted credit card number in another DynamoDB table called `CreditCardTokenizerTable` (as specified in the Lambda Layer) and finally store the customer information along with the credit card token in DynamoDB table called `CustomerOrderTable`. 
+1. **order** - The first API i.e. *order* is to create the customer order, generate the token for credit card number (using Lambda Layer) and store encrypted credit card number in another DynamoDB table called `TokenTable` (as specified in the Lambda Layer) and finally store the customer information along with the credit card token in DynamoDB table called `CustomerOrderTable`. 
 2. **paybill** - The second API i.e. *paybill* takes the `CustomerOrder` number and fetches credit card token from  `CustomerOrderTable` and calls decrypt method in Lambda Layer to get the deciphered credit card number. 
 
 **Step 6.10** Let's call */order* API to create the order with the following code. Replace the value of `PaymentMethodApiURL` (Step 6.5) and `IdToken` (Step 6.8) with the values identified in the previous steps. 
@@ -447,7 +447,7 @@ The output will look like
 {"message": "Payment Submitted Successfully", "CreditCard Charged": "0000-0000-0000-0000"}
 ````
 
-Application has created the customer order with required details and saved the plain text information (generated credit card token) in DynamoDB table called `CustomerOrdeTable` and encrypted `CreditCard` information is stored in another DynamoDB table called `CreditCardTokenizerTable`. Now, check the values in both the tables to see what items are stored. 
+Application has created the customer order with required details and saved the plain text information (generated credit card token) in DynamoDB table called `CustomerOrdeTable` and encrypted `CreditCard` information is stored in another DynamoDB table called `TokenTable`. Now, check the values in both the tables to see what items are stored. 
 
 **Step 6.12** Get the items stored in `CustomerOrdeTable`
 
@@ -478,10 +478,10 @@ The output will look like
 
 Note the value of `CreditCardToken`. It will be the generated token value and not actual `CreditCard` provided by the end user.
 
-**Step 6.13** Get the items stored in `CreditCardTokenizerTable`. Replace the value of `CreditCardToken` (Step 6.11) and `AccountId` (Step 6.5) with previously identified values.
+**Step 6.13** Get the items stored in `TokenTable`. Replace the value of `CreditCardToken` (Step 6.11) and `AccountId` (Step 6.5) with previously identified values.
 
 ```bash
-aws dynamodb get-item --table-name CreditCardTokenizerTable --key '{ "Hash_Key" : { "S": "<CreditCardToken>" }, "Account_Id" : { "S" : "<AccountId>" }  }'
+aws dynamodb get-item --table-name TokenTable --key '{ "Hash_Key" : { "S": "<CreditCardToken>" }, "Account_Id" : { "S" : "<AccountId>" }  }'
 ```
 
 The output will look like 
@@ -510,7 +510,7 @@ The output will look like
 
 Note the value of `CandidateString`. It will be the encrypted value of `CreditCard` instead of the plain text. 
 
-Here, in step 6, the CloudFormation stack created DynamoDB table for storing customer order information, Lambda function for handling request and response, APIs for creating order and paying bill and Cognito user pool for API authentication. In order to verify application functionality, we created a Cognito user to call the APIs and validated plain text (generated token) in `CustomerOrderTable` and encrypted credit card information in `CreditCardTokenizerTable` DynamoDB tables.  
+Here, in step 6, the CloudFormation stack created DynamoDB table for storing customer order information, Lambda function for handling request and response, APIs for creating order and paying bill and Cognito user pool for API authentication. In order to verify application functionality, we created a Cognito user to call the APIs and validated plain text (generated token) in `CustomerOrderTable` and encrypted credit card information in `TokenTable` DynamoDB tables.  
 
 ## Step 7: Clean up and delete the resources
 

@@ -1,13 +1,13 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: AWS Lambdsa Layer for tokenization of sensitive data (uksb-1s7fb4gd2)
+Description: AWS Lambda Layer for tokenization of sensitive data (uksb-1s7fb4gd2)
 
 Resources:
   LambdaLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
-      LayerName: 'TokenizeData'
-      Description: 'This layer contains the libraries for DynamoDB client for encryption which provides client side encryption of dynamodb items to help protect your data before you send to DyanmoDB'
+      LayerName: 'TokenProvider'
+      Description: 'This layer contains the libraries for DynamoDB client for encryption which provides client side encryption of DynamoDB items to help protect your data before you send to DynamoDB'
       ContentUri: 'dynamodb-client/'
       CompatibleRuntimes:
       - python3.7
@@ -16,7 +16,7 @@ Resources:
   TokenDatabase:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: 'CreditCardTokenizerTable'
+      TableName: 'TokenTable'
       AttributeDefinitions: 
         - AttributeName: "Hash_Key"
           AttributeType: "S"
@@ -40,7 +40,7 @@ Outputs:
       Ref: LambdaLayer
     Export:
       Name:
-        Fn::Sub: 'TokenizeData'
+        Fn::Sub: 'TokenProvider'
   DynamoDBArn:
     Description: ARN for DynamoDB Table
     Value: !GetAtt TokenDatabase.Arn

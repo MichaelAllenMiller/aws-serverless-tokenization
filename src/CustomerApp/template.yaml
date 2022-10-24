@@ -16,7 +16,7 @@ Parameters:
     Default: default
   encryptTableName:
     Type: String
-    Default: CreditCardTokenizerTable
+    Default: TokenTable
   customerTableName:
     Type: String
     Default: CustomerOrderTable
